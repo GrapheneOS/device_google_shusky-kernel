@@ -1,0 +1,11 @@
+drops {
+  android_build_drop {
+    build_id: "9450862"
+    target: "shusky_debug_memory"
+    source_file: "phy-exynos-usbdrd-super.ko"
+  }
+  dest_file: "debug_memory/phy-exynos-usbdrd-super.ko"
+  version: "Linux version 5.15.83-android14-5-763460-g4ed2d1b36228-ab9450862 (build-user@build-host) (Android (9394278, based on r475365b) clang version 16.0.2 (https://android.googlesource.com/toolchain/llvm-project e1a2893d16330144736de1f4f0d06a844a03b9b0), LLD 16.0.2) #1 SMP PREEMPT Fri Dec 16 06:34:30 UTC 2022"
+  version_group: "kernel-and-modules"
+  git_project: "device/google/shusky-kernel"
+}

@@ -1,0 +1,11 @@
+drops {
+  android_build_drop {
+    build_id: "9480929"
+    target: "shusky_debug_memory_accounting"
+    source_file: "zuma-a0.dtb"
+  }
+  dest_file: "debug_memory_accounting/zuma-a0.dtb"
+  version: "Linux version 5.15.85-android14-5-763797-g5c9026d487a5-ab9480929 (build-user@build-host) (Android (9394278, based on r475365b) clang version 16.0.2 (https://android.googlesource.com/toolchain/llvm-project e1a2893d16330144736de1f4f0d06a844a03b9b0), LLD 16.0.2) #1 SMP PREEMPT Tue Jan 10 08:53:23 UTC 2023"
+  version_group: "kernel-and-modules"
+  git_project: "device/google/shusky-kernel"
+}
