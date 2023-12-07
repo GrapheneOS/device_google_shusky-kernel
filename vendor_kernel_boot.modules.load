@@ -100,6 +100,7 @@ extra/private/google-modules/soc/gs/drivers/usb/dwc3/dwc3-exynos-usb.ko
 extra/private/google-modules/soc/gs/drivers/usb/host/xhci-exynos.ko
 extra/private/google-modules/soc/gs/drivers/usb/gadget/function/usb_f_dm.ko
 extra/private/google-modules/soc/gs/drivers/usb/gadget/function/usb_f_dm1.ko
+extra/private/google-modules/soc/gs/drivers/usb/gadget/function/usb_f_etr_miu.ko
 extra/private/google-modules/soc/gs/drivers/usb/gadget/function/usb_f_rndis.ko
 extra/private/google-modules/soc/gs/drivers/usb/typec/tcpm/google/usb_psy.ko
 extra/private/google-modules/soc/gs/drivers/usb/typec/tcpm/google/tcpci_max77759.ko
@@ -173,6 +174,7 @@ extra/private/google-modules/display/samsung/panel/panel-samsung-s6e3hc3.ko
 extra/private/google-modules/display/samsung/panel/panel-samsung-s6e3hc3-c10.ko
 extra/private/google-modules/display/samsung/panel/panel-samsung-s6e3hc4.ko
 extra/private/google-modules/display/samsung/exynos-drm.ko
+extra/private/google-modules/display/samsung/exynos-drm-audio.ko
 extra/private/google-modules/gps/broadcom/bcm47765/bcm47765.ko
 extra/private/google-modules/gpu/mali_kbase/mali_kbase.ko
 extra/private/google-modules/gpu/mali_pixel/mali_pixel.ko
