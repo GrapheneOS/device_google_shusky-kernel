@@ -299,8 +299,8 @@ struct tui_hw_buffer {
 	__u64 fb_size;
 } __attribute__((packed));
 
-#define EXYNOS_START_TUI	0x10
-#define EXYNOS_FINISH_TUI	0x11
+#define EXYNOS_START_TUI		0x10
+#define EXYNOS_FINISH_TUI		0x11
 #define EXYNOS_TUI_REQUEST_BUFFER	0x20
 #define EXYNOS_TUI_RELEASE_BUFFER	0x21
 
@@ -343,13 +343,54 @@ struct histogram_bins {
 	__u16 data[HISTOGRAM_BIN_COUNT];
 };
 
-#define EXYNOS_DRM_HISTOGRAM_EVENT	0x80000000
+/**
+ * enum histogram_prog_pos - defines programmable positions
+ *
+ * For example, histogram position and writeback path could be
+ * programmable. This enum defines positions for it.
+ */
+enum histogram_prog_pos {
+	POST_DQE,
+	PRE_DQE,
+};
+
+/**
+ * enum histogram_flags - defines control masks for optional features
+ */
+enum histogram_flags {
+	HISTOGRAM_FLAGS_BLOCKED_ROI	= 0x20, /* blocked roi configuration is valid */
+};
+
+/**
+ * struct histogram_channel_config - histogram channel configuration
+ *
+ * @roi: histogram roi
+ * @weights: histogram weights
+ * @threshold: histogram threshold
+ * @pos: histogram position (before or after DQE)
+ * @blocked_roi: histogram blocked roi (ignored if h/w does not support it)
+ * @flags: histogram optional configuration flags
+ *
+ * It is used to set a property of a crtc.
+ */
+struct histogram_channel_config {
+	struct histogram_roi		roi;
+	struct histogram_weights	weights;
+	enum histogram_prog_pos		pos;
+	__u32				threshold;
+	struct histogram_roi		blocked_roi;
+	__u32				flags;
+};
+
+#define EXYNOS_DRM_HISTOGRAM_EVENT		0x80000000
+#define EXYNOS_DRM_HISTOGRAM_CHANNEL_EVENT	0x80000001
 
 /**
  * struct exynos_drm_histogram_event - histogram event to wait for user-space
  *
  * @base: event header which informs user space event type and length.
  * @bins: histogram bin data to be sent to user space through using read()
+ * @crtcid: crtc id
  *
  * User space waits for POLLIN event using like poll() or select(). If event
  * type is EXYNOS_DRM_HISTOGRAM_EVENT, user space can try to read histogram
@@ -362,23 +403,76 @@ struct exynos_drm_histogram_event {
 };
 
 /**
- * enum exynos_prog_pos - defines programmable positions
+ * struct exynos_drm_histogram_channel_event - histogram channel event to wait for user-space
  *
- * For example, histogram position and writeback path could be
- * programmable. This enum defines positions for it.
+ * @base: event header which informs user space event type and length.
+ * @bins: histogram bin data to be sent to user space through using read()
+ * @crtcid: crtc id
+ * @histid: histogram channel id
+ *
+ * User space waits for POLLIN event using like poll() or select(). If event
+ * type is EXYNOS_DRM_HISTOGRAM_EVENT, user space can try to read histogram
+ * bin data through "bins".
  */
-enum exynos_prog_pos {
-	POST_DQE,
-	PRE_DQE,
+struct exynos_drm_histogram_channel_event {
+	struct drm_event base;
+	struct histogram_bins bins;
+	__u16 crtc_id;
+	__u16 hist_id;
 };
 
-#define EXYNOS_HISTOGRAM_REQUEST	0x0
-#define EXYNOS_HISTOGRAM_CANCEL		0x1
+#define EXYNOS_HISTOGRAM_REQUEST		0x0
+#define EXYNOS_HISTOGRAM_CANCEL			0x1
+#define EXYNOS_HISTOGRAM_CHANNEL_REQUEST	0x20
+#define EXYNOS_HISTOGRAM_CHANNEL_CANCEL		0x21
+#define EXYNOS_HISTOGRAM_CHANNEL_DATA_REQUEST	0x30 /* histogram data is returned via ioctl */
 
-#define DRM_IOCTL_EXYNOS_HISTOGRAM_REQUEST	DRM_IOW(DRM_COMMAND_BASE + \
-		EXYNOS_HISTOGRAM_REQUEST, __u32)
-#define DRM_IOCTL_EXYNOS_HISTOGRAM_CANCEL	DRM_IOW(DRM_COMMAND_BASE + \
-		EXYNOS_HISTOGRAM_CANCEL, __u32)
+/**
+ * struct exynos_drm_histogram_channel_request - histogram channel query control structure
+ *
+ * @crtcid: crtc id
+ * @histid: histogram channel id
+ *
+ * User space sends an IOCTL
+ *   DRM_EXYNOS_HISTOGRAM_CHANNEL_REQUEST
+ *   DRM_EXYNOS_HISTOGRAM_CHANNEL_CANCEL
+ * with struct exynos_drm_histogram_channel_request data type.
+ */
+struct exynos_drm_histogram_channel_request {
+	__u32 crtc_id; /* crtc id */
+	__u32 hist_id; /* histogram channel id */
+};
+
+/**
+ * struct exynos_histogram_channel_request - histogram channel request
+ *
+ * @crtcid: in: crtc id
+ * @histid: in : histogram channel id
+ * @bins: out: histogram bin data to be sent to user space through using read()
+ *
+ * User space sends an IOCTL
+ *   EXYNOS_HISTOGRAM_CHANNEL_SYNC_REQUEST
+ * with struct exynos_drm_histogram_channel_data_request data type
+ */
+struct exynos_drm_histogram_channel_data_request {
+	__u16 crtc_id; /* in: crtc id */
+	__u16 hist_id; /* in: histogram channel id */
+	struct histogram_bins *bins; /* out: histogram data */
+};
+
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_REQUEST \
+	DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_REQUEST, __u32)
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_CANCEL \
+	DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CANCEL, __u32)
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_CHANNEL_REQUEST \
+	DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CHANNEL_REQUEST, \
+		struct exynos_drm_histogram_channel_request)
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_CHANNEL_CANCEL \
+	DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CHANNEL_CANCEL, \
+		struct exynos_drm_histogram_channel_request)
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_CHANNEL_DATA_REQUEST \
+	DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CHANNEL_DATA_REQUEST, \
+		struct exynos_drm_histogram_channel_data_request)
 
 #if defined(__cplusplus)
 }

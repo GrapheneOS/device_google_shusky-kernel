@@ -175,20 +175,53 @@ struct histogram_weights {
 struct histogram_bins {
   __u16 data[HISTOGRAM_BIN_COUNT];
 };
+enum histogram_prog_pos {
+  POST_DQE,
+  PRE_DQE,
+};
+enum histogram_flags {
+  HISTOGRAM_FLAGS_BLOCKED_ROI = 0x20,
+};
+struct histogram_channel_config {
+  struct histogram_roi roi;
+  struct histogram_weights weights;
+  enum histogram_prog_pos pos;
+  __u32 threshold;
+  struct histogram_roi blocked_roi;
+  __u32 flags;
+};
 #define EXYNOS_DRM_HISTOGRAM_EVENT 0x80000000
+#define EXYNOS_DRM_HISTOGRAM_CHANNEL_EVENT 0x80000001
 struct exynos_drm_histogram_event {
   struct drm_event base;
   struct histogram_bins bins;
   __u32 crtc_id;
 };
-enum exynos_prog_pos {
-  POST_DQE,
-  PRE_DQE,
+struct exynos_drm_histogram_channel_event {
+  struct drm_event base;
+  struct histogram_bins bins;
+  __u16 crtc_id;
+  __u16 hist_id;
 };
 #define EXYNOS_HISTOGRAM_REQUEST 0x0
 #define EXYNOS_HISTOGRAM_CANCEL 0x1
+#define EXYNOS_HISTOGRAM_CHANNEL_REQUEST 0x20
+#define EXYNOS_HISTOGRAM_CHANNEL_CANCEL 0x21
+#define EXYNOS_HISTOGRAM_CHANNEL_DATA_REQUEST 0x30
+struct exynos_drm_histogram_channel_request {
+  __u32 crtc_id;
+  __u32 hist_id;
+};
+struct exynos_drm_histogram_channel_data_request {
+  __u16 crtc_id;
+  __u16 hist_id;
+  struct histogram_bins * bins;
+};
 #define DRM_IOCTL_EXYNOS_HISTOGRAM_REQUEST DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_REQUEST, __u32)
 #define DRM_IOCTL_EXYNOS_HISTOGRAM_CANCEL DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CANCEL, __u32)
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_CHANNEL_REQUEST DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CHANNEL_REQUEST, struct exynos_drm_histogram_channel_request)
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_CHANNEL_CANCEL DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CHANNEL_CANCEL, struct exynos_drm_histogram_channel_request)
+#define DRM_IOCTL_EXYNOS_HISTOGRAM_CHANNEL_DATA_REQUEST DRM_IOW(DRM_COMMAND_BASE + EXYNOS_HISTOGRAM_CHANNEL_DATA_REQUEST, struct exynos_drm_histogram_channel_data_request)
 #ifdef __cplusplus
 }
 #endif
